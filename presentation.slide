@@ -231,7 +231,7 @@ Quando o `$GOPATH` não é definido, usa-se:
 
 Se esses padrões não te agradam, continue setando o `$GOPATH` para o seu local preferido.
 
-* Mudaças no runtime
+* Mudanças no runtime
 
 * Profile de contenção de mutex
 
