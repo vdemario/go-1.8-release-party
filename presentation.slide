@@ -54,7 +54,7 @@ A maioria dos programas deve rodar um pouco mais rápido por conta de melhorias 
 O novo compilador, baseado em static single assignment form (SSA), gera código mais compacto e eficiente e é uma plataforma melhor para otimizações de baixo nível.
 
 - Em ambientes ARM de 32-bits, os benchmarks diminuíram o tempo de CPU em 20-30%.
-- Em sistemas x96 de 64 bits os ganhos foram mais modestos, entre 0-10%, pq o SSA já tinha sido implementado na versão 1.7.
+- Em sistemas x86 de 64 bits os ganhos foram mais modestos, entre 0-10%, pq o SSA já tinha sido implementado na versão 1.7.
 - Outras arquiteturas provavelmente terão ganhos semelhantes ao ARM de 32 bits.
 
 .link https://dave.cheney.net/2016/11/19/go-1-8-toolchain-improvements Post do Dave Cheney sobre melhorias nas ferramentas do Go 1.8
