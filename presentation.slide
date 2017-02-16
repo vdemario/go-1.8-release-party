@@ -1,200 +1,208 @@
 Go 1.8 Release Party
-YOUR MEETUP
+São Paulo
 16 Feb 2017
 
-YOUR MEETUP
+Vitor De Mario
+@vdemario
 
-* License and Materials
+* Licença
 
-This presentation is licensed under the [[https://creativecommons.org/licenses/by-sa/4.0/][Creative Commons Attribution-ShareAlike 4.0 International]] licence.
+Essa apresentação é baseada na licença [[https://creativecommons.org/licenses/by-sa/4.0/][Creative Commons Attribution-ShareAlike 4.0 International]].
 
-The materials for this presentation are available on GitHub:
+Ela foi construída originalmente em inglês pelo Dave Cheney. O material original está disponível no Github:
 
 .link https://github.com/davecheney/go-1.8-release-party
 
-You are encouraged to remix, transform, or build upon the material, providing you distribute your contributions under the same license.
+E a versão em português no fork:
 
-If you have suggestions or corrections to this presentation, please raise [[https://github.com/davecheney/go-1.8-release-party/issues][an issue on the GitHub project]].
+.link https://github.com/vdemario/go-1.8-release-party
+
+Pode ser modificada livremente desde que mantenha a mesma licença.
 
 * Go 1.8
 
-Go 1.8 is _really_close_ to release. Seriously.
+A versão 1.8 do Go está _muito_perto_ de ser lançada. É sério.
 
 .image img/rocket.jpg _ 350
 
+Talvez até tenha saído hoje depois que eu terminei de mexer nos slides (a esperança é a última que morre).
+
 # .link https://groups.google.com/forum/#!topic/golang-dev/G09HaWfMl6g
 
-Go 1.8 is the 9th release in the Go 1 series. It follows from the previous version, Go 1.7, [[https://blog.golang.org/go1.7][released on the 16th of August, 2016]]
+A versão Go 1.8 é o nono release do Go 1, sucedendo a versão 1.7, [[https://blog.golang.org/go1.7][lançada em 16 de agosto de 2016]].
 
 .link http://beta.golang.org/doc/go1.8 Go 1.8 Release Notes (DRAFT)
 
-* What's changed
+* Mudanças
 
-So, what's happened in the last six months since Go 1.7?
+Então, o que foi que aconteceu nos últimos 6 meses desde o Go 1.7?
 
 - Performance
-- Compiler changes
-- Tool changes
-- Runtime changes
-- Changes to the standard library
+- Mudanças no compilador
+- Mudanças na ferramenta de linha de comando
+- Mudanças no runtime
+- Mudanças na standard library
 
 * Performance
 
 * Performance
 
-As always, the changes are so general and varied that precise statements about performance are difficult to make.
+Como de hábito, é difícil dar detalhes precisos sobre performance.
 
-Most programs should run a bit faster, due to speedups in the garbage collector and optimizations in the standard library.
+A maioria dos programas deve rodar um pouco mais rápido por conta de melhorias no garbage collector e otimizações dentro da standard library.
 
-The new back end, based on static single assignment form (SSA), generates more compact, more efficient code and provides a better platform for optimizations such as bounds check elimination.
+O novo compilador, baseado em static single assignment form (SSA), gera código mais compacto e eficiente e é uma plataforma melhor para otimizações de baixo nível.
 
-- The new back end reduces the CPU time required by our benchmark programs by 20-30% on 32-bit ARM systems.
-- For 64-bit x86 systems, which already used the SSA back end in Go 1.7, the gains are a more modest 0-10%.
-- Other architectures will likely see improvements closer to the 32-bit ARM numbers.
+- Em ambientes ARM de 32-bits, os benchmarks diminuíram o tempo de CPU em 20-30%.
+- Em sistemas x96 de 64 bits os ganhos foram mais modestos, entre 0-10%, pq o SSA já tinha sido implementado na versão 1.7.
+- Outras arquiteturas provavelmente terão ganhos semelhantes ao ARM de 32 bits.
 
-.link https://dave.cheney.net/2016/11/19/go-1-8-toolchain-improvements Go 1.8 Toolchain Improvements
+.link https://dave.cheney.net/2016/11/19/go-1-8-toolchain-improvements Post do Dave Cheney sobre melhorias nas ferramentas do Go 1.8
 
 * Garbage Collector
 
-Garbage collection pauses should be significantly shorter than they were in Go 1.7, usually under 100 microseconds and often as low as 10 microseconds.
+Pausas de garbage collection devem ser bem menores que no Go 1.7 em geral, geralmente abaixo de 100 microsegundos e frequentemente ate 10 microsegundos.
 
-.link https://talks.golang.org/2017/state-of-go.slide#34 Garbage Collector Improvements Over Time (ht. @francesc)
+.link https://talks.golang.org/2017/state-of-go.slide#34 Melhorias no Garbage Collector ao longo do tempo (palestra do @francesc)
 
-# More work remains for Go 1.9.
+O trabalho continuará pro Go 1.9.
 
-# .link https://github.com/golang/proposal/blob/master/design/17503-eliminate-rescan.md Eliminating Stop-The-World Stack Re-scanning (Design doc)
+.link https://github.com/golang/proposal/blob/master/design/17503-eliminate-rescan.md Eliminating Stop-The-World Stack Re-scanning (Design doc)
 
 * Defer
 
-The overhead of deferred function calls has been reduced by nearly half.
+O custo de chamadas de função com `defer` caiu quase pela metade.
 
  name           old time/op  new time/op  delta
  Defer-4        75.1ns ± 1%  43.3ns ± 1%  -42.31%   (p=0.000 n=8+10)
  
- In reality, this speeds up defer by about 2.2X. The two benchmarks
- below compare a Lock/defer Unlock pair (DeferLock) with a Lock/Unlock
- pair (NoDeferLock). NoDeferLock establishes a baseline cost, so these
- two benchmarks together show that this change reduces the overhead of
- defer from 61.4ns to 27.9ns.
+ Na realidade, isso deixa o defer 2.2x mais rápido. Os dois benchmarks
+ de baixo comparam um par Lock/defer Unlock (DeferLock) com um par
+ Lock/Unlock sem defer (NoDeferLock). O NoDeferLock define um custo
+ base, ou seja, essa mudança reduz o overhead do defer de 61.4ns para
+ 27.9ns.
  
  name           old time/op  new time/op  delta
  DeferLock-4    77.4ns ± 1%  43.9ns ± 1%  -43.31%  (p=0.000 n=10+10)
  NoDeferLock-4  16.0ns ± 0%  15.9ns ± 0%   -0.39%    (p=0.000 n=9+8)
 
-.link https://golang.org/cl/29656 Source: CL 29656
-.link https://dave.cheney.net/2016/11/19/go-1-8-toolchain-improvements#defer Defer and cgo improvements
+.link https://golang.org/cl/29656 Fonte: CL 29656
+.link https://dave.cheney.net/2016/11/19/go-1-8-toolchain-improvements#defer Seção sobre defer no post do Dave Cheney
  
 * Cgo
 
-The overhead of cgo calls is reduced by more than half:
+O custo de chamadas com cgo caiu mais que 50%:
 
  name       old time/op  new time/op  delta
  CgoNoop-8   146ns ± 1%    56ns ± 6%  -61.57%  (p=0.000 n=25+30)
 
-This is the result of merging two defers on the standard cgo calling path.
+Isso nasceu da junção de dois defers no caminho padrão das chamadas cgo.
 
-.link https://crawshaw.io/blog/go1.8-cgo Less cgo overhead in Go 1.8
+.link https://crawshaw.io/blog/go1.8-cgo Post do David Crawshaw
 
-* Miscellaneous performance improvements
+* Pequenas melhorias por toda parte
 
-Lots of small updates to the standard library.
+Várias atualizações pequenas na standard library.
 
-There have been optimizations to implementations in the `bytes`, `crypto/aes`, `crypto/cipher`, `crypto/elliptic`, `crypto/sha256`, `crypto/sha512`, `encoding/asn1`, `encoding/csv`, `encoding/hex`, `encoding/json`, `hash/crc32`, `image/color`, `image/draw`, `math`, `math/big`, `reflect`, `regexp`, `runtime`, `strconv`, `strings`, `syscall`, `text/template`, and `unicode/utf8` packages.
+Tivemos otimizações nas implementações dos pacotes `bytes`, `crypto/aes`, `crypto/cipher`, `crypto/elliptic`, `crypto/sha256`, `crypto/sha512`, `encoding/asn1`, `encoding/csv`, `encoding/hex`, `encoding/json`, `hash/crc32`, `image/color`, `image/draw`, `math`, `math/big`, `reflect`, `regexp`, `runtime`, `strconv`, `strings`, `syscall`, `text/template`, e `unicode/utf8`.
 
-.link http://beta.golang.org/doc/go1.8#library Go 1.8 Standard Library Changes
+.link http://beta.golang.org/doc/go1.8#library Link oficial de mudanças na standard library para o Go 1.8
 
-* Compiler changes
+* Mudanças no compilador
 
-* SSA backend
+* SSA
 
-- All backends updated to use the new SSA form. Old "plan9" style compiler backend deleted.
-- Big performance improvements for 32-bit ARM.
-- Easy to add new SSA backends (for values of easy compiler engineers work in). eg, adding MIPS backend was straight forward, SPARC and RISC-V are rumored to be next.
+- Todas as plataformas agora usam SSA. Backend antigo no estilo "plan9" foi deletado.
+- Grandes melhorias na performance do ARM 32 bits.
+- Agora é fácil de adicionar novas plataformas com SSA ("fácil" para quem trabalha com compilador). Adicionar o MIPS foi tranquilo, há humores de que vem SPARC e RISC-V pela frente.
 
-* New parser
+* Novo parser
 
-Robert Griesemer and Matthew Dempsky replaced the parser.
+O Robert Griesemer e o Matthew Dempsky reescreveram o parser.
 
-The new parser removes many of the package level variables which came along for the ride from the previous YACC based parser.
+O novo parser remove uma boa parte das variáveis de pacote que tinham vindo do parser antigo baseado em YACC.
 
-Removing package level globals is a stepping stone to making the compiler more parallel. In fact this work has started in the development branch.
+Essa remoção das variáveis "globais" de pacote é uma etapa na direção de deixar o compilador mais paralelo. Esse trabalho inclusive já começou em um branch.
 
-This new parser is considerably faster, but in 1.8 is hamstrung by having to convert between the new style AST and the old version the rest of the compiler expects.
+O novo parser é considerável mais rápido, mas não teve grande impacto no 1.8 pq ele gasta tempo convertendo a AST no estilo novo para o estilo antigo que as outras partes do compilador esperam.
 
-Expect this AST conversion to be removed in Go 1.9.
+Essa conversão deve ser removida no Go 1.9.
 
-* Compiler speed
+Ou seja, há esperança de tempos de compilação bem melhores num futuro não muito distante.
 
-About a 12-15% improvement compared to Go 1.7
+* Velocidade do compilador
+
+Entre 12-15% mais rápido em relação ao Go 1.7
 
 .image https://dave.cheney.net/wp-content/uploads/2016/11/Screenshot-2016-11-19-at-08.57.10.png
 
-* Struct conversion
+* Conversão de structs
 
-When explicitly converting a value from one struct type to another, as of Go 1.8 the tags are ignored.
+Quando se converte explicitamente de uma struct para outra, a partir do Go 1.8 as tags são ignoradas.
 
 .play examples/struct_conversion.go /START OMIT/,/END OMIT/
 
-* Ports
+* Novas plataformas
 
-The number of platforms Go supports, on balance, continues to grow.
+O número de plataformas suportadas pelo Go continua crescendo.
 
-- Go now supports 32-bit MIPS on Linux for both big-endian (linux/mips) and little-endian machines (linux/mipsle) that implement the MIPS32r1 instruction set with FPU or kernel FPU emulation. Note that many common MIPS-based routers lack an FPU and have firmware that doesn't enable kernel FPU emulation; Go won't run on such machines.
-- On DragonFly BSD, Go now requires DragonFly 4.4.4 or later.
-- On OpenBSD, Go now requires OpenBSD 5.9 or later.
-- The Plan 9 port's networking support is now much more complete and matches the behavior of Unix and Windows with respect to deadlines and cancelation.
-- Go 1.8 now only supports OS X 10.8 or later. _This_is_likely_the_last_Go_release_to_support_10.8_. Compiling Go or running binaries on older OS X versions is untested.
+- O Go  agora suporta MIPS de 32 bits no Linux tanto para máquinas big-endian (linux/mips) quanto máquinas little-endian (linux/mipsle) que implementem o conjunto de instruções MIPS32r1 com FPU ou emulação de FPU no kernel. Note que uma boa parte dos roteadores baseados em MIPS não tem uma FPU e o firmware desabilita emulação de FPU no kernel; Go não vai rodar nessas máquinas.
+- No DragonFly BSD, agora é necessário DragonFly 4.4.4 ou mais novo.
+- No OpenBSD, agora é necessário OpenBSD 5.9 ou mais novo.
+- O suporte a rede do Plan 9 agora é bem mais completo e tem o mesmo comportamento de Unix e Windows em relação a deadlines e cancelamentos.
+- A partir do Go 1.8, só há suporte ao OS X 10.8 ou mais novo. _Essa_é_provavelmente_a_última_versão_do_Go_a_suportar_o_10.8_. Compilar e rodar binários Go em versões mais velhas do OS X não foi testado, tudo pode acontecer.
 
-* Go 1.8 may be the last to support ARMv5
+* O Go 1.8 pode ser o último a suportar ARMv5
 
-Supporting ARMv5 has been a problem for several releases. 
+Suporte ao ARMv5 tem sido um problema há várias versões.
 
-Currently we have no ARMv5 builders so have no idea if Go 1.8 actually works on real ARMv5 hardware (we test on ARMv7).
+No momento não há hardware para rodar os builders em ARMv5 então não se sabe se o Go 1.8 roda realmente em hardware ARMv5 real (testes são feitos no ARMv7).
 
-Several companies have complained about loosing ARMv5 support, and several have offered to run a builder -- but there are _still_ no real ARMv5 builders on the dashboard.
+Várias empresas reclamaram de perder o suporte ao ARMv5, algumas se ofereceram para rodar um builder -- mas até hoje não há um builder rodando.
 
-If you or your company care about ARMv5, you have to shoulder some of the burden. Contact @bradfitz and set up a builder.
+Se você ou a sua empresa se importa com o ARMv5, ajude entre em contato com o Brad Fitzpatrick (@bradfitz).
 
 .link https://github.com/golang/go/issues/17082 Proposal: runtime: drop support for linux/armv5E and linux/armv6
 .link https://github.com/golang/go/wiki/DashboardBuilders Dashboard Builders (wiki)
 
-_No_ARMv5_builders_means_ARMv5_support_will_be_dropped_in_Go_1.9_.
+_Se_continuar_sem_builders_de_ARMv5_não_vai_ter_suporte_no_Go_1.9_.
 
-* Tool changes
+* Mudanças nas ferramentas de linha de comando
 
 * go tool yacc
 
-The yacc tool (previously available by running “go tool yacc”) has been removed. As of Go 1.7 it was no longer used by the Go compiler.
+O yacc (antigamente disponível rodndo “go tool yacc”) foi removido. A partir do Go 1.7 ele não é mais usado pelo compilador.
 
-It has moved to the “tools” repository and is now available at golang.org/x/tools/cmd/goyacc.
+O código foi movido para o repositório "tools" e agora vive em golang.org/x/tools/cmd/goyacc.
 
 * go tool asm
 
-`go`tool`asm` now supports a flotilla of Intel and PPC vector instructions.
+`go`tool`asm` agora tem suporte a um monte de instruções vetoriais Intel e PPC.
+(original: `go`tool`asm` now supports a flotilla of Intel and PPC vector instructions.)
 
-For 64-bit x86 systems, the following instructions have been added: `VBROADCASTSD`, `BROADCASTSS`, `MOVDDUP`, `MOVSHDUP`, `MOVSLDUP`, `VMOVDDUP`, `VMOVSHDUP`, and `VMOVSLDUP`.
+Para sistemas x86 de 64 bits, essas instruções foram adicionadas: `VBROADCASTSD`, `BROADCASTSS`, `MOVDDUP`, `MOVSHDUP`, `MOVSLDUP`, `VMOVDDUP`, `VMOVSHDUP`, e `VMOVSLDUP`.
 
-For 64-bit PPC systems, the common vector scalar instructions have been added: `LXS`, `LXSDX`, `LXSI`, `LXSIWAX`, `LXSIWZX`, `LXV`, `LXVD2X`, `LXVDSX`, `LXVW4X`, `MFVSR`, `MFVSRD`, `MFVSRWZ`, `MTVSR`, `MTVSRD`, `MTVSRWA`, `MTVSRWZ`, `STXS`, `STXSDX`, `STXSI`, `STXSIWX`, `STXV`, `STXVD2X`, `STXVW4X`, `XSCV`, `XSCVDPSP`, `XSCVDPSPN`, `XSCVDPSXDS`, `XSCVDPSXWS`, `XSCVDPUXDS`, `XSCVDPUXWS`, `XSCVSPDP`, `XSCVSPDPN`, `XSCVSXDDP`, `XSCVSXDSP`, `XSCVUXDDP`, `XSCVUXDSP`, `XSCVX`, `XSCVXP`, `XVCV`, `XVCVDPSP`, `XVCVDPSXDS`, `XVCVDPSXWS`, `XVCVDPUXDS`, `XVCVDPUXWS`, `XVCVSPDP`, `XVCVSPSXDS`, `XVCVSPSXWS`, `XVCVSPUXDS`, `XVCVSPUXWS`, `XVCVSXDDP`, `XVCVSXDSP`, `XVCVSXWDP`, `XVCVSXWSP`, `XVCVUXDDP`, `XVCVUXDSP`, `XVCVUXWDP`, `XVCVUXWSP`, `XVCVX`, `XVCVXP`, `XXLAND`, `XXLANDC`, `XXLANDQ`, `XXLEQV`, `XXLNAND`, `XXLNOR`, `XXLOR`, `XXLORC`, `XXLORQ`, `XXLXOR`, `XXMRG`, `XXMRGHW`, `XXMRGLW`, `XXPERM`, `XXPERMDI`, `XXSEL`, `XXSI`, `XXSLDWI`, `XXSPLT`, and `XXSPLTW`.
+Para sistemas PPC de 64 bits, as instruções vetoriais escalares comuns foram adicionadas: `LXS`, `LXSDX`, `LXSI`, `LXSIWAX`, `LXSIWZX`, `LXV`, `LXVD2X`, `LXVDSX`, `LXVW4X`, `MFVSR`, `MFVSRD`, `MFVSRWZ`, `MTVSR`, `MTVSRD`, `MTVSRWA`, `MTVSRWZ`, `STXS`, `STXSDX`, `STXSI`, `STXSIWX`, `STXV`, `STXVD2X`, `STXVW4X`, `XSCV`, `XSCVDPSP`, `XSCVDPSPN`, `XSCVDPSXDS`, `XSCVDPSXWS`, `XSCVDPUXDS`, `XSCVDPUXWS`, `XSCVSPDP`, `XSCVSPDPN`, `XSCVSXDDP`, `XSCVSXDSP`, `XSCVUXDDP`, `XSCVUXDSP`, `XSCVX`, `XSCVXP`, `XVCV`, `XVCVDPSP`, `XVCVDPSXDS`, `XVCVDPSXWS`, `XVCVDPUXDS`, `XVCVDPUXWS`, `XVCVSPDP`, `XVCVSPSXDS`, `XVCVSPSXWS`, `XVCVSPUXDS`, `XVCVSPUXWS`, `XVCVSXDDP`, `XVCVSXDSP`, `XVCVSXWDP`, `XVCVSXWSP`, `XVCVUXDDP`, `XVCVUXDSP`, `XVCVUXWDP`, `XVCVUXWSP`, `XVCVX`, `XVCVXP`, `XXLAND`, `XXLANDC`, `XXLANDQ`, `XXLEQV`, `XXLNAND`, `XXLNOR`, `XXLOR`, `XXLORC`, `XXLORQ`, `XXLXOR`, `XXMRG`, `XXMRGHW`, `XXMRGLW`, `XXPERM`, `XXPERMDI`, `XXSEL`, `XXSI`, `XXSLDWI`, `XXSPLT`, e `XXSPLTW`.
 
 * go tool trace
 
-The `trace` tool has a new `-pprof` flag for producing pprof-compatible blocking and latency profiles from an execution trace.
+A ferramenta `trace` agora tem uma flag `-pprof` para produzir profiles de bloqueio e latência compatíveis com o pprof a partir de um trace.
 
-Garbage collection events are now shown more clearly in the execution trace viewer.
+Eventos de garbage collection aparecem mais claramente no visualizador.
 
-Garbage collection activity is shown on its own row and GC helper goroutines are annotated with their roles.
+Atividade do garbage collector aparece na sua própria linha e rotinas helper do GC são anotadas com seus papéis (roles).
 
-.link https://www.youtube.com/watch?v=mmqDlbWk_XA Rhys Hiltner's execution tracer presentation (dotGo 2016)
+.link https://www.youtube.com/watch?v=mmqDlbWk_XA Apresentação do Rhys Hiltner no dotGo 2016 sobre o execution tracer
 
 * go tool vet
 
-Vet is stricter in some ways and looser where it previously caused false positives. Vet now checks for:
+O vet agora é maie estrito em algumas coisas e mais frouxo onde ele antes causava falsos positivos. O vet agora verifica:
 
-- copying an array of locks
-- duplicate JSON and XML struct field tags
-- non-space-separated struct tags
-- deferred calls to HTTP `Response.Body.Close` before checking errors
-- indexed arguments in `Printf`.
+- copiar um array de locks
+- struct tags JSON e XML duplicadas
+- struct tags que não estão separadas por espaço
+- chamar com defer ao `Response.Body.Close` do HTTP antes de checar o erro
+- argumentos indexados no `Printf`.
 
 .code examples/vet_repeated_json_tags.go
 
@@ -202,41 +210,41 @@ Vet is stricter in some ways and looser where it previously caused false positiv
 
 * go fix
 
-`go`fix` now rewrites references to `golang.org/x/net/context` to the standard library provided `context` package.
+O `go`fix` agora muda automaticamente referências ao `golang.org/x/net/context` pelo pacote `context` da standard library.
 
 * go bug
 
-The new `go`bug` command starts a bug report on GitHub, prefilled with information about the current system.
+O novo comando `go`bug` abre um novo bug report no GitHub, pré-preenchido com as informações do sistema.
 
 Example:
 
 .play examples/gobug.sh /go bug/
 
-* Default $GOPATH
+* $GOPATH padrão
 
-Lastly, it is no longer necessary to set `$GOPATH` before using the `go` command.
+Não é mais necessário definir um `$GOPATH` antes de usar o comando `go`.
 
-When `GOPATH` is not defined, the tool will use:
+Quando o `$GOPATH` não é definido, usa-se:
 
-- `$HOME/go` on Unix
-- `%USERPROFILE%\go` on Windows
+- `$HOME/go` no Unix
+- `%USERPROFILE%\go` no Windows
 
-If you don't like these defaults, just set `$GOPATH` to your preferred location.
+Se esses padrões não te agradam, continue setando o `$GOPATH` para o seu local preferido.
 
-* Runtime changes
+* Mudaças no runtime
 
-* Mutex contention profile
+* Profile de contenção de mutex
 
-Peter Wienberger has added a new pprof profile, mutex contention.
+Peter Wienberger adicionou um novo profile ao pprof, contenção de mutex.
 
 .code examples/mutex_test.go /testing.B/,/^}/
 
 
-_note_: Due to an oversight this only works with `sync.Mutex`, not `sync.RWMutex`, this oversight will be addressed early in Go 1.9.
+_nota_: Por acidente isso só funciona com `sync.Mutex`, não `sync.RWMutex`, o que vai ser corrigido no Go 1.9.
 
-.link https://github.com/golang/go/issues/18496 runtime: contended mutex profiling doesn't work for sync.RWMutex
+.link https://github.com/golang/go/issues/18496 issue sobre o assunto no github
 
-* Mutex contention profile
+* Profile de contenção de mutex
 
     % go test examples/mutex_test.go -bench=. -mutexprofile=mutex.out
     % go tool pprof mutex.test mutex.out
@@ -256,121 +264,97 @@ _note_: Due to an oversight this only works with `sync.Mutex`, not `sync.RWMutex
          .          .     18:   const N = 16
          .          .     19:   for n := 0; n < b.N; n++ {
 
-* Homework
-
-Mutex profile is not supported in, [[pkg/profile][https://github.com/pkg/profile]]. yet ...
-
-Who wants to be the first to send me a PR?
-
 * Plugins
 
-Go now supports a “plugin” build mode for generating plugins written in Go, and a new plugin package for loading such plugins at run time.
+O Go agora tem suporte a um modo de compilação de "plugins" para gerar plugins escritos em Go, com um novo pacote `plugin` para carregar esses plugins em tempo de execução.
 
-Plugin support is currently only available on Linux.
+Suporte a plugins por enquanto só está disponível no Linux.
 
-* Plugin Example
-
-.code examples/plugins/plugin.go
-
-Then to build plugin.so
-
- $ go build -buildmode=plugin plugin.go
-
-* Plugin Example - Using Plugin
-.code examples/plugins/main.go  /START OMIT/,/END OMIT/
-
- $ go run main.go
- main started...
- Plugin loading
- Hello, number 7
-
-* Plugins demo
-
-Demo video: [[https://twitter.com/francesc/status/827851085943566336][twitter.com/francesc]]
-
-Source code: [[https://github.com/campoy/golang-plugins][github.com/campoy/golang-plugins]]
+Mais detalhes na próxima apresentação.
 
 * os.Executable
 
-`os.Executable` returns an absolute path to the currently running program.
+`os.Executable` retorna o caminho absoluto do programa que está rodando agora.
 
 .play examples/os_executable.go /START OMIT/,/END OMIT/
 
-Executable returns the path name for the executable that started the current process. There is no guarantee that the path is still pointing to the correct executable.
+`Executable` retona o path do executável que iniciou o processo atual. Não há garantia que esse path ainda esteja apontando pro executável certo.
 
-If a symlink was used to start the process, depending on the operating system, the result might be the symlink or the path it pointed to. If a stable result is needed, path/filepath.EvalSymlinks might help.
+Se um link simbólico foi usado pra iniciar o processo, dependendo do sistema operacional, o resultado pode ser o link ou o path que o link aponta. Caso um resultado estável seja necessário, pode-se usar path/filepath.EvalSymlinks.
 
 .link http://beta.golang.org/pkg/os/#Executable os.Executable (godoc.org)
 
-* Detection of concurrent map accesses
+* Detecção de acesso a concorrente a maps
 
-In Go 1.6, the runtime added lightweight, [[http://talks.godoc.org/github.com/davecheney/gosyd/go1.6.slide#18][best-effort detection of concurrent misuse of maps]]. Go 1.8 improves that detector with support for detecting programs that concurrently write to and iterate over a map.
+No Go 1.6, o runtime adicionou [[http://talks.godoc.org/github.com/davecheney/gosyd/go1.6.slide#18][uma tentativa best-effort de detectar o uso incorreto de maps concorrentemente]]. O Go 1.8 melhora essa detecção encontrando programas que escrevem em um mapa e iteram sobre ele ao mesmo tempo concorrentemente.
 
 .play examples/maps.go /func main/,/^}/
 
-If the runtime detects this condition, it prints a diagnosis and crashes the program.
+Quando o runtime detecta isso, ele imprime um diagnóstico e crasha o programa.
 
-* Changes to the standard library
+* Mudanças na standard library
 
 * sort.Slice
 
-The `sort` package has a new convenice method `sort.Slice`
+O pacote `sort` agora tem um método extremamente conveniente `sort.Slice`
 
 .code examples/sort.go /switch.+{/,/^\t}/
 
-* HTTP shutdown
+* HTTP: Graceful shutdown
 
-A long requested feature, graceful shutdown of a `http.Server` was added in Go 1.8.
+Pedido antigo: o graceful shutdown de um `http.Server` foi adicionado no Go 1.8.
 
-Call `Shutdown` when a signal is received:
+Chame o `Shutdown` quando um sinal for recebido:
 
 .code examples/shutdown.go /main\(\) {/,/^}
 
 * HTTP/2
 
-`http.Response` now satisfies the `http.Pusher` interface.
+O `http.Response` agora satisfaz a interface  `http.Pusher`.
 
     type Pusher interface {
         Push(target string, opts *PushOptions) error
     }
 
-* More context support
+* Mais suporte a context
 
-Continuing Go 1.7's adoption of `context.Context` into the standard library, Go 1.8 adds more context support to existing packages:
+Continuando a adoção do `context.Context` na standard library que começou pelo Go 1.7, o 1.8 adiciona mais suporte em diversos pacotes:
 
-- The new `Server.Shutdown` takes a context argument.
-- There have been significant additions to the `database/sql` package with context support.
-- All nine of the new `Lookup` methods on the new `net.Resolver` now take a context.
+- A nova função `Server.Shutdown` aceita um context como argumento.
+- Adições significativas ao `database/sql` com suporte a context.
+- Todos os nove métodos `Lookup` no novo `net.Resolver` aceitam um context.
 
-* Minor changes
+* Pequenas mudanças
 
-.link http://beta.golang.org/doc/go1.8#minor_library_changes Minor library changes
+.link http://beta.golang.org/doc/go1.8#minor_library_changes Lista completa de pequenas mudanças na standard library
 
-* What's coming up in Go 1.9
+* O que vem pela frente no Go 1.9
 
-* What's coming up in Go 1.9
+* O que vem pela frente no Go 1.9
 
-Before we close, let's quickly touch on some of the things coming up in Go 1.9
+Antes de encerrar, uma pequena passagem pelo que está sendo feito pro Go 1.9.
 
-_note_: All of these are speculation, nothing is set in stone until code hits the repo.
+_nota_: Tudo isso é especulação, nada está escrito na pedra até o código entrar oficialmente.
 
-* Aliases
+* Alias
 
-After being rolled back before the Go 1.8 freeze, aliases are being re-proposed for Go 1.9 in a more limited fashion.
+Depois de um rollback antes do freeze do Go 1.8, a proposta de alias está sendo refeita pro Go 1.9 em um formato mais limitado.
 
 .link https://golang.org/design/18130-type-alias
 
 .play -edit examples/alias.go
 
-* Faster / cheaper runtime.MemStats
+* runtime.MemStats mais rápido / barato
 
-The cost of calling `runtime.MemStats` is propotional to the size of the heap; Austin recently timed it at ~1.7ms per Gb.
+O custo de chamar o `runtime.MemStats` é proporcional ao tamanho do heap; Austin Clements recentemente mediu isso em ~1.7ms por Gb.
 
-There is a CL ready to land that reduces it to 20 us per proc (thread servicing a goroutine) which is a much smaller upper bound.
+Tem uma CL pronta pra entrar que reduz isso a 20 us por proc (thread servindo uma goroutine) que é um limite superior bem mais baixo.
+
+O stop-the-world do garbage collector acontece aqui, o que é relevante.
 
 .link https://golang.org/issue/13613
 
-* Improvements to the inliner
+* Melhorias para o inliner
 
 Inlining has historically been limited to leaf functions because of the concern of agressive inlining on the call graph.
 
@@ -378,7 +362,7 @@ In support of this Robert Griesemer and Matthew Dempsky have been improving the 
 
 An unnamed intern has been hired to work on the inliner for 1.9.
 
-Josh Bleecher-Snyder has also suggest that the cost model for inlining should be revised to make sure inlining is paying for itself.
+Josh Bleecher-Snyder has also suggested that the cost model for inlining should be revised to make sure inlining is paying for itself.
 
 .link https://github.com/golang/go/issues/17566 Issue 17566
 
@@ -395,25 +379,24 @@ Recently Ian Lance Taylor landed a refactor that broken our the `runtime` pollin
 
 There is no sign of a programmer accessible poller, yet.
 
-* Official dependency management tool
+* Ferramenta de gerenciamento de dependências oficial
 
-Finally!
+Chegou a hora!
 
-Peter Bourgon, Sam Boyer, Jess Frazelle, and Steve Francia have been working on an _official_ dependency management tool, `dep`.
+Peter Bourgon, Sam Boyer, Jess Frazelle, e Steve Francia estão trabalhando em uma ferramenta _official_ de gerenciamento de dependências chamada `dep`.
 
-If you're used to Glide or govendor, you won't be too surprised.
+Se você está acostumado com o glide ou o govendor, vai ser familiar.
 
-.link https://groups.google.com/forum/#!topic/go-package-management/et1qFUjrkP4 Mailing List Announcement
+.link https://groups.google.com/forum/#!topic/go-package-management/et1qFUjrkP4 Anúncio
 
-It's described as _pre_alpha_ at the moment, but you should check it out, and let them know what you think.
+Ainda é considerada _pré_alfa_ no momento, mas todo mundo está encorajado a dar uma olhada e já começar a opinar em issues e PRs, vai virar realidade.
 
 .link https://github.com/golang/dep
 
-* Conclusion
+* Conclusão
 
 .image img/party-gopher.png
 
-Upgrade to Go 1.8, now!
+Atualizem para o Go 1.8, desde já!
 
-It's literally the best version of Go, _ever_.
-
+É literalmente a melhor versão do Go.

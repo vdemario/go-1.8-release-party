@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 func main() {
 	example()
 }
@@ -16,6 +18,7 @@ func example() {
 	var v2 T2
 	v1 = T1(v2) // now legal
 	_ = v1
+	fmt.Println("funcionou!")
 }
 
 // END OMIT

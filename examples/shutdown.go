@@ -11,18 +11,18 @@ func main() {
 	srv := &http.Server{Addr: ":8080", Handler: http.DefaultServeMux}
 
 	go func() {
-		fmt.Println("Press enter to shutdown server")
+		fmt.Println("Aperte enter para parar o servidor")
 		fmt.Scanln()
-		log.Println("Shutting down server...")
+		log.Println("Parando o servidor...")
 		if err := srv.Shutdown(context.Background()); err != nil { // HL
-			log.Fatalf("could not shutdown: %v", err)
+			log.Fatalf("não foi possível parar: %v", err)
 		}
 	}()
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "Happy Go 1.8'th")
+		fmt.Fprintln(w, "Feliz dia do Go 1.8")
 	})
 	if err := srv.ListenAndServe(); err != http.ErrServerClosed { // HL
-		log.Fatalf("listen: %s\n", err)
+		log.Fatalf("ouvindo: %s\n", err)
 	}
 }

@@ -26,6 +26,5 @@ func main() {
 		fallthrough
 	default:
 		sort.Slice(subs, func(i, j int) bool { return subs[i].Rating > subs[j].Rating })
-
 	}
 }

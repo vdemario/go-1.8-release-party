@@ -10,7 +10,7 @@ type D = B
 
 func main() {
 	var ( a A; b B; c C; d D )
-	a = b	// nope
-	b = c	// also nope
-	d = b	// new in Go 1.9!
+	a = b	// não funciona
+	b = c	// tb não
+	d = b	// novo no Go 1.9!
 }
